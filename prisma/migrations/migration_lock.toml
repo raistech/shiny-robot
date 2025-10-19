@@ -1,0 +1,4 @@
+# Prisma Migrate lockfile
+# This file should be committed to your repository to ensure consistent
+# migration engine provider across environments.
+provider = "sqlite"

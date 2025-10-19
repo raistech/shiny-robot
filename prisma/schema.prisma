@@ -1,0 +1,115 @@
+// Prisma schema for Chat Moderation App using SQLite
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  // Create database under project/data/db.sqlite
+  url      = "file:../data/db.sqlite"
+}
+
+model User {
+  id          Int         @id @default(autoincrement())
+  username    String      @unique
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  statuses    MemberStatus[]
+  warns       Warn[]
+  sanctions   Sanction[]
+  auditLogs   AuditLog[]  @relation("AuditActor")
+  targetLogs  AuditLog[]  @relation("AuditTarget")
+}
+
+model Chat {
+  id        Int            @id @default(autoincrement())
+  name      String
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  statuses  MemberStatus[]
+  warns     Warn[]
+  sanctions Sanction[]
+  auditLogs AuditLog[]     @relation("AuditChat")
+}
+
+model MemberStatus {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  chat      Chat     @relation(fields: [chatId], references: [id])
+  chatId    Int
+  status    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, chatId])
+}
+
+model Warn {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  chat      Chat     @relation(fields: [chatId], references: [id])
+  chatId    Int
+  reason    String?
+  createdAt DateTime @default(now())
+
+  @@index([userId, chatId])
+}
+
+model Sanction {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  chat      Chat     @relation(fields: [chatId], references: [id])
+  chatId    Int
+  type      String
+  reason    String?
+  expiresAt DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([userId, chatId])
+}
+
+model Config {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique @default("default")
+  settings  Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AuditLog {
+  id           Int       @id @default(autoincrement())
+  action       String
+  actor        User?     @relation("AuditActor", fields: [actorUserId], references: [id])
+  actorUserId  Int?
+  chat         Chat?     @relation("AuditChat", fields: [chatId], references: [id])
+  chatId       Int?
+  targetUser   User?     @relation("AuditTarget", fields: [targetUserId], references: [id])
+  targetUserId Int?
+  metadata     Json?
+  createdAt    DateTime  @default(now())
+
+  @@index([actorUserId])
+  @@index([chatId])
+  @@index([targetUserId])
+}
+
+model RateLimit {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique
+  count     Int      @default(0)
+  resetAt   DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Optional scoping to entities
+  user      User?    @relation(fields: [userId], references: [id])
+  userId    Int?
+  chat      Chat?    @relation(fields: [chatId], references: [id])
+  chatId    Int?
+
+  @@index([resetAt])
+}
