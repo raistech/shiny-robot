@@ -1,0 +1,29 @@
+{
+  "name": "chat-moderation-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Prisma + SQLite setup with repositories for chats, users, and config",
+  "scripts": {
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev --name init",
+    "prisma:push": "prisma db push",
+    "prisma:seed": "prisma db seed",
+    "build": "tsc -p tsconfig.json",
+    "demo": "tsx scripts/demo.ts"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.20.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.5",
+    "prisma": "^5.20.0",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.3"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
