@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Post {
+  id           String    @id @default(cuid())
+  slug         String    @unique
+  title        String
+  content      String?   @db.Text
+  excerpt      String?   @db.Text
+  image        String?
+  authorId     String?
+  authorEmail  String?
+  authorName   String?
+  category     String?
+  published    Boolean   @default(false)
+  featured     Boolean   @default(false)
+  readTime     Int?      // Reading time in minutes
+  views        Int       @default(0)
+  likes        Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  publishedAt  DateTime?
+  
+  tags      PostTag[]
+  comments  Comment[]
+  
+  @@index([published, createdAt])
+  @@index([slug])
+  @@index([category])
+  @@index([authorEmail])
+  @@index([featured])
+}
+
+model Tag {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  createdAt   DateTime  @default(now())
+  
+  posts       PostTag[]
+  
+  @@index([slug])
+}
+
+model PostTag {
+  postId String
+  tagId  String
+  
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  
+  @@id([postId, tagId])
+  @@index([tagId])
+}
+
+model Author {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  bio       String?  @db.Text
+  avatar    String?
+  twitter   String?
+  linkedin  String?
+  github    String?
+  website   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([email])
+}
+
+model Newsletter {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  
+  @@index([active])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  postId    String
+  author    String
+  email     String
+  content   String   @db.Text
+  approved  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  
+  @@index([postId])
+  @@index([approved, createdAt])
+}

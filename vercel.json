@@ -1,0 +1,13 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "env": {
+    "DATABASE_URL": "@database-url",
+    "NEXT_PUBLIC_STORYBLOK_ACCESS_TOKEN": "@storyblok-token",
+    "STORYBLOK_ACCESS_TOKEN": "@storyblok-token",
+    "NEXT_PUBLIC_DISQUS_SHORTNAME": "@disqus-shortname",
+    "NEXT_PUBLIC_SITE_URL": "@site-url"
+  }
+}
